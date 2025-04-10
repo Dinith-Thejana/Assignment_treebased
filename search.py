@@ -1,6 +1,6 @@
 import heapq
 import sys
-
+import math
 
 
 
@@ -16,6 +16,13 @@ class Graph:
     def add_edge(self, start, end, cost):
         self.edges[start][end] = cost
         self.edges[end][start] = cost  # Assuming undirected graph
+
+    def heuristic(self, node, goal):
+        """Euclidean distance heuristic for GBFS and A*."""
+        x1, y1 = self.nodes[node]
+        x2, y2 = self.nodes[goal]
+        return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
 def parse_file(filename):
     """Reads the file and builds the graph correctly."""
     graph = Graph()
@@ -98,6 +105,31 @@ def dfs(graph, start, goal):
                 stack.append((neighbor, path + [neighbor]))
     
     return None
+
+
+def a_star(graph, start, goal):
+    pq = [(0, start, [start], 0)]  # (f, node, path, g)
+    visited = set()
+    cost_dict = {start: 0}  
+
+    while pq:
+        _, node, path, g = heapq.heappop(pq)
+        if node in visited:
+            continue
+        visited.add(node)
+
+        if node == goal:
+            return path, g  
+
+        for neighbor in graph.edges[node]:
+            new_g = g + graph.edges[node][neighbor]
+            if neighbor not in cost_dict or new_g < cost_dict[neighbor]:
+                cost_dict[neighbor] = new_g
+                f = new_g + graph.heuristic(neighbor, goal)
+                heapq.heappush(pq, (f, neighbor, path + [neighbor], new_g))
+
+    return None, float('inf')
+
 # Custom Search 1 - Iterative Deepening DFS
 def cus1(graph, start, goal):
     def dls(node, goal, depth, path):
