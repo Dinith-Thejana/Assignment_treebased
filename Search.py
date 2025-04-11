@@ -106,25 +106,6 @@ def dfs(graph, start, goal):
     
     return None
 
-def bfs(graph, start, goal):
-    queue = [(start, [start])]
-    visited = set()
-    
-    while queue:
-        node, path = queue.pop(0)
-        if node in visited:
-            continue
-        visited.add(node)
-
-        if node == goal:
-            return path
-        
-        for neighbor in graph.edges[node]:
-            if neighbor not in visited:
-                queue.append((neighbor, path + [neighbor]))
-
-    return None
-
 
 def a_star(graph, start, goal):
     pq = [(0, start, [start], 0)]  # (f, node, path, g)
