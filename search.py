@@ -1,4 +1,6 @@
 import sys
+import heapq
+import math
 
 class Graph:
     def __init__(self):
@@ -12,6 +14,12 @@ class Graph:
     def add_edge(self, start, end, cost):
         self.edges[start][end] = cost
         self.edges[end][start] = cost  # Assuming undirected graph
+
+    def heuristic(self, node, goal):
+        """Euclidean distance heuristic for GBFS and A*."""
+        x1, y1 = self.nodes[node]
+        x2, y2 = self.nodes[goal]
+        return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2) 
 
 def parse_file(filename):
     """Reads the file and builds the graph correctly."""
@@ -112,6 +120,25 @@ def bfs(graph, start, goal):
         for neighbor in graph.edges[node]:
             if neighbor not in visited:
                 queue.append((neighbor, path + [neighbor]))
+
+    return None
+
+def gbfs(graph, start, goal):
+    pq = [(graph.heuristic(start, goal), start, [start])]
+    visited = set()
+
+    while pq:
+        _, node, path = heapq.heappop(pq)
+        if node in visited:
+            continue
+        visited.add(node)
+
+        if node == goal:
+            return path
+
+        for neighbor in graph.edges[node]:
+            if neighbor not in visited:
+                heapq.heappush(pq, (graph.heuristic(neighbor, goal), neighbor, path + [neighbor]))
 
     return None
 
