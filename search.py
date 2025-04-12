@@ -204,4 +204,51 @@ def cus2(graph, start, goal):
 
     return None, float('inf')
 
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python search.py <filename> <method>")
+        sys.exit(1)
+
+    filename = sys.argv[1]
+    method = sys.argv[2].upper()
+
+    graph, origin, destinations = parse_file(filename)
+
+    best_path = None
+    best_cost = float('inf')
+    best_goal = None
+
+    for goal in destinations:
+        if method == "DFS":
+            path = dfs(graph, origin, goal)
+            cost = len(path) if path else float('inf')
+        elif method == "BFS":
+            path = bfs(graph, origin, goal)
+            cost = len(path) if path else float('inf')
+        elif method == "GBFS":
+            path = gbfs(graph, origin, goal)
+            cost = len(path) if path else float('inf')
+        elif method == "AS":
+            path, cost = a_star(graph, origin, goal)
+        elif method == "IDDFS":
+            path = cus1(graph, origin, goal)
+            cost = len(path) if path else float('inf')
+        elif method == "UCS":
+            path, cost = cus2(graph, origin, goal)
+        else:
+            print(f"Invalid method: {method}")
+            sys.exit(1)
+
+        if path and cost < best_cost:
+            best_path = path
+            best_cost = cost
+            best_goal = goal
+
+    if best_path:
+        print(f"{filename} {method}")
+        print(f"Goal: {best_goal}, Nodes Expanded: {len(best_path)}, Cost: {best_cost}")
+        print("Path:", " -> ".join(map(str, best_path)))
+    else:
+        print(f"No valid path found from {origin} to any destination using {method}.")
+
 
